@@ -6,7 +6,8 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "build": "rm -rf ./client/dist && webpack build --config ./webpack/config.prod.js",
+    "start": "node server.js",
+    "build": "rm -rf ./dist && webpack build --config ./webpack/config.prod.js",
     "dev": "webpack serve --config ./webpack/config.dev.js"
   },
   "author": "",
@@ -23,9 +24,11 @@
     "@material/mwc-tab": "^0.27.0",
     "@material/mwc-tab-bar": "^0.27.0",
     "@webcomponents/webcomponentsjs": "^2.7.0",
+    "express": "^5.1.0",
     "lit": "2.0.0",
     "mobiledoc-kit": "^0.15.0",
     "mobx": "5.15.4",
+    "path": "^0.12.7",
     "zod": "^3.21.4"
   },
   "devDependencies": {
