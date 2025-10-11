@@ -64,8 +64,8 @@ const DEFAULT_GENERATION_PARAMS: ModelParams = {
   }
 };
 
-const TEXT_MODEL_ID = 'gemini-pro';
-const DIALOG_MODEL_ID = 'gemini-pro';
+const TEXT_MODEL_ID = 'gemini-2.5-flash';
+const DIALOG_MODEL_ID = 'gemini-2.5-flash';
 
 export async function callTextModel(
   textPrompt: string,
