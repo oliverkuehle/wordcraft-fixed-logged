@@ -778,6 +778,7 @@ function patchGetSelection() {
     const shadowRootOrDocument: ShadowRoot | Document = activeElement
       ? (activeElement.getRootNode() as ShadowRoot | Document)
       : document;
+    // TODO: error in firefox (TypeError: getSelection is not a function)
     const selection = (shadowRootOrDocument as any).getSelection();
 
     if (!selection || useOld) return oldGetSelection();
