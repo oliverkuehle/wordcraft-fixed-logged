@@ -26,7 +26,7 @@ module.exports = {
   module: shared.module,
   resolve: shared.resolve,
   plugins: [
-    new DotEnvPlugin(),
+    new DotEnvPlugin({ systemvars: true }),
     new HtmlWebpackPlugin({
       inject: false,
       template: shared.resolveDir('../app/static/index.html'),
