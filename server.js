@@ -1,7 +1,33 @@
 const express = require('express');
+const {Pool} = require('pg');
 const path = require('path');
 
 const app = express();
+app.use(express.json({limit: '1mb'})); // parse JSON bodies
+
+// Heroku injects DATABASE_URL
+const pool = new Pool({
+  connectionString:
+    process.env.DATABASE_URL,
+  ssl: {rejectUnauthorized: false}, // required by Heroku Postgres
+});
+
+// POST /api/log  -> { userId?: number, eventKey: string, eventValue: any }
+app.post('/api/log', async (req, res) => {
+  const {userId = null, eventKey, eventValue} = req.body ?? {};
+  if (!eventKey) return res.status(400).json({error: 'eventKey required'});
+
+  try {
+    await pool.query(
+      'INSERT INTO logs (user_id, event_key, event_value) VALUES ($1, $2, $3)',
+      [userId, eventKey, JSON.stringify(eventValue)]
+    );
+    res.json({ok: true});
+  } catch (err) {
+    console.error('Failed to insert log:', err);
+    res.status(500).json({error: 'insert_failed'});
+  }
+});
 
 // Serve static files from the 'dist' directory
 app.use(express.static(path.join(__dirname, 'dist')));
@@ -11,8 +37,11 @@ app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-// Use the PORT environment variable provided by Heroku
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+app.listen(port, () => console.log(`Server listening on ${port}`));
+
+// Graceful shutdown (Heroku dynos)
+process.on('SIGTERM', async () => {
+  await pool.end();
+  process.exit(0);
 });
