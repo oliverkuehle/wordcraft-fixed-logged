@@ -107,6 +107,7 @@ export class TextInputControlComponent extends MobxLitElement {
     const {control} = this;
 
     if (!control.hasHelperOperation()) return '';
+    if (control.helperOperation.getButtonLabel() === 'get a suggested way to rewrite') return '';
     const hoverTooltip = control.helperOperation!.getDescription();
 
     // clang-format off
