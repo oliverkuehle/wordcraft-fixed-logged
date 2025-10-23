@@ -22,7 +22,21 @@ import {computed, decorate, observable} from 'mobx';
 import {CancelOperationError} from '@lib/errors';
 import {Constructor} from '@lib/types';
 import {uuid} from '@lib/uuid';
-import {ChoiceOperation, RewriteChoiceOperation} from '../operations';
+import {
+  ChoiceOperation,
+  ContinuationOperation,
+  ElaborationOperation,
+  FirstSentenceOperation,
+  FreeformOperation,
+  GenerateWithinSentenceOperation,
+  NewStoryOperation,
+  NextSentenceOperation,
+  ReplaceOperation,
+  RewriteChoiceOperation,
+  RewriteEndOfSentenceOperation,
+  RewriteSelectionOperation,
+  RewriteSentenceOperation,
+} from '../operations';
 import {ServiceProvider as OperationServiceProvider} from '../operations/operation';
 import {ChoiceStep} from '../operations/steps/choice_step';
 import {CursorService, SentencesService, TextEditorService} from './services';
@@ -33,6 +47,8 @@ import {ConfigService} from './config_service';
 import {ModelResult, OperationSite, OperationTrigger} from '../shared/types';
 
 import {Service} from './service';
+import {setCurrentOperationId, setCurrentOperationName} from '../../state';
+import {logEvent} from '../../db';
 
 // tslint:disable-next-line:enforce-comments-on-exported-symbols
 export interface ServiceProvider {
@@ -250,6 +266,17 @@ export class OperationsService extends Service {
 
     operation.onFinish((wasSuccess: boolean) => {
       this.removeOperation(operation);
+
+      logEvent({
+        key: 'OPERATION_FINISHED',
+        value: {
+          operation_id: operation.getOperationData().id,
+          operation_name: getOperationName(operation),
+          wasSuccess: wasSuccess,
+        },
+      });
+      this.updateCurrentOperationData(this.currentOperation);
+
       if (operation.isHelperOperation) {
         if (!wasSuccess) {
           this.finalizeOperation();
@@ -263,6 +290,15 @@ export class OperationsService extends Service {
         callback(operation);
       }
     });
+    operation.onRun(() => {
+      logEvent({
+        key: 'OPERATION_RUNNING',
+        value: {
+          operation_id: operation.getOperationData().id,
+          operation_name: getOperationName(operation),
+        },
+      });
+    })
 
     this.operationStack.push(operation);
     const currentOperation = this.currentOperation!;
@@ -272,6 +308,16 @@ export class OperationsService extends Service {
     try {
       currentOperation.setInitialState(initialState);
       const operationPromise = currentOperation.start();
+
+      this.updateCurrentOperationData(currentOperation);
+      logEvent({
+        key: 'OPERATION_STARTED',
+        value: {
+          operation_id: currentOperation.getOperationData().id,
+          operation_name: getOperationName(currentOperation),
+        },
+      });
+
       result = await operationPromise;
       // tslint:disable-next-line:no-any
     } catch (err: any) {
@@ -289,6 +335,13 @@ export class OperationsService extends Service {
 
     this.textEditorService.triggerUpdateCallbacks();
     return result;
+  }
+
+  updateCurrentOperationData(operation: Operation | null) {
+    const operation_id = operation?.getOperationData().id;
+    const operation_name = getOperationName(operation || null);
+    setCurrentOperationId(operation_id);
+    setCurrentOperationName(operation_name);
   }
 
   async rewriteCurrentChoice() {
@@ -346,6 +399,42 @@ function isOperationClass(obj: OperationClass | OperationFactory) {
     }
   }
   return false;
+}
+
+function getOperationName(operation: Operation | null): string {
+  if (operation == null) {
+    return 'NULL';
+  }
+
+  if (operation instanceof RewriteSelectionOperation) {
+    return 'REWRITE_SELECTION';
+  } else if (operation instanceof RewriteSentenceOperation) {
+    return 'REWRITE_SENTENCE';
+  } else if (operation instanceof RewriteEndOfSentenceOperation) {
+    return 'REWRITE_END_OF_SENTENCE';
+  } else if (operation instanceof ReplaceOperation) {
+    return 'REPLACE';
+  } else if (operation instanceof NextSentenceOperation) {
+    return 'NEXT_SENTENCE';
+  } else if (operation instanceof NewStoryOperation) {
+    return 'NEW_STORY';
+  } else if (operation instanceof GenerateWithinSentenceOperation) {
+    return 'GENERATE_WITHIN_SENTENCE';
+  } else if (operation instanceof FreeformOperation) {
+    return 'FREEFORM';
+  } else if (operation instanceof FirstSentenceOperation) {
+    return 'FIRST_SENTENCE';
+  } else if (operation instanceof ElaborationOperation) {
+    return 'ELABORATE';
+  } else if (operation instanceof ContinuationOperation) {
+    return 'CONTINUE';
+  } else if (operation instanceof ChoiceOperation) {
+    return 'SUGGEST_REWRITE';
+  } else if (operation instanceof RewriteChoiceOperation) {
+    return 'META_PROMPT';
+  } else {
+    throw new Error('Unknown operation type');
+  }
 }
 
 decorate(OperationsService, {

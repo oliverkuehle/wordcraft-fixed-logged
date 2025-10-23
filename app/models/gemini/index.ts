@@ -43,6 +43,7 @@ import {
 import {ContextService, StatusService} from '@services/services';
 import {startsWithPunctuation} from '@lib/parse_sentences/utils';
 import { logEvent, LogEventTextModelKey } from '../../db';
+import { getCurrentOperationId, getCurrentOperationName } from '../../state';
 
 const D0 = '{';
 const D1 = '}';
@@ -151,6 +152,8 @@ export class GeminiModel extends Model {
     logEvent({
       key: operation,
       value: { 
+        operation_id: getCurrentOperationId(),
+        operation_name: getCurrentOperationName(),
         prompt_text: promptText,
         model_result: res,
         output: output,

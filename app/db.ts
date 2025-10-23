@@ -30,6 +30,8 @@ export type LogEventTextModel = {
     | 'ELABORATE'
     | 'CONTINUE';
   value: {
+    operation_id: string;
+    operation_name: string;
     prompt_text: string;
     model_result: string;
     output: ModelResults;
@@ -38,6 +40,15 @@ export type LogEventTextModel = {
     instructions: string;
   };
 };
+
+export type LogEventOperationStatus = {
+  key: 'OPERATION_STARTED' | 'OPERATION_FINISHED' | 'OPERATION_RUNNING';
+  value: {
+    operation_id: string;
+    operation_name: string;
+    wasSuccess?: boolean;
+  };
+}
 
 export type LogEventDialogModel =
   | {
@@ -65,7 +76,7 @@ export type LogEventTextModelKey = LogEventTextModel['key'];
  * Automatically stringifies JSON and handles basic errors.
  */
 export async function logEvent(
-  event: LogEventTextModel | LogEventDialogModel
+  event: LogEventTextModel | LogEventDialogModel | LogEventOperationStatus
 ): Promise<void> {
   const body = JSON.stringify({    
     event_key: event.key,
