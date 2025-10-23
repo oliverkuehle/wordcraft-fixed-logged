@@ -51,6 +51,26 @@ export type LogEventOperationStatus = {
   };
 }
 
+export type LogEventChoices = {
+  key:
+    | 'CHOICE_STARRED_REMOVE'
+    | 'CHOICE_STARRED_INSERT'
+    | 'CHOICE_STAR'
+    | 'CHOICE_UNSTAR'
+    | 'CHOICE_CHOOSE'
+    | 'CHOICE_REMOVE'
+    | 'CHOICE_REWRITE'
+    | 'CHOICE_CANCEL'
+    | 'CHOICE_REFRESH'
+  value: {
+    choice_id: string;
+    choice_text: string;
+    operation_id: string;
+    operation_name: string;
+    plainText?: string;
+  };
+};
+
 export type LogEventDialogModel =
   | {
       key: 'CHAT';
@@ -77,7 +97,7 @@ export type LogEventTextModelKey = LogEventTextModel['key'];
  * Automatically stringifies JSON and handles basic errors.
  */
 export async function logEvent(
-  event: LogEventTextModel | LogEventDialogModel | LogEventOperationStatus
+  event: LogEventTextModel | LogEventDialogModel | LogEventChoices | LogEventOperationStatus
 ): Promise<void> {
   const body = JSON.stringify({    
     event_key: event.key,

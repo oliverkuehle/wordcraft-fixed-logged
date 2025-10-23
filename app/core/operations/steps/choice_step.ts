@@ -23,6 +23,8 @@ import {OperationsService} from '../../services/operations_service';
 import {ModelResult} from '../../shared/types';
 
 import {Step} from './step';
+import { logEvent } from '../../../db';
+import { getCurrentOperationId, getCurrentOperationName } from '../../../state';
 
 export type ChoiceCallback = (choice: ModelResult, index: number) => void;
 export type RemoveChoiceCallback = (
@@ -111,6 +113,17 @@ export class ChoiceStep extends Step {
   chooseIndex(index: number) {
     const choice = this.choices.getEntry(index);
     if (choice != null) {
+
+      logEvent({
+        key: 'CHOICE_CHOOSE',
+        value: {
+          choice_id: choice.uuid,
+          choice_text: choice.text,
+          operation_id: getCurrentOperationId(),
+          operation_name: getCurrentOperationName(),
+        },
+      });
+      
       this.chooseCallback(choice, index);
     }
   }
@@ -120,6 +133,17 @@ export class ChoiceStep extends Step {
     this.choices.removeAtIndex(index);
     const isEmpty = this.choices.getNEntries() === 0;
     if (choice != null) {
+      
+      logEvent({
+        key: 'CHOICE_REMOVE',
+        value: {
+          choice_id: choice.uuid,
+          choice_text: choice.text,
+          operation_id: getCurrentOperationId(),
+          operation_name: getCurrentOperationName(),
+        },
+      });
+
       this.removeChoiceCallback(choice, index, isEmpty);
     }
   }

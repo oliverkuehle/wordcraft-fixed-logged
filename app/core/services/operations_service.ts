@@ -47,7 +47,7 @@ import {ConfigService} from './config_service';
 import {ModelResult, OperationSite, OperationTrigger} from '../shared/types';
 
 import {Service} from './service';
-import {setCurrentOperationId, setCurrentOperationName} from '../../state';
+import {getCurrentOperationId, getCurrentOperationName, setCurrentOperationId, setCurrentOperationName} from '../../state';
 import {logEvent} from '../../db';
 
 // tslint:disable-next-line:enforce-comments-on-exported-symbols
@@ -300,7 +300,7 @@ export class OperationsService extends Service {
           plainText: this.textEditorService.getPlainText(),
         },
       });
-    })
+    });
 
     this.operationStack.push(operation);
     const currentOperation = this.currentOperation!;
@@ -354,6 +354,16 @@ export class OperationsService extends Service {
       parentChoiceStep.pause();
       const choiceToRewrite = parentChoiceStep.choices.getCurrentEntry();
       if (choiceToRewrite == null) return;
+
+      logEvent({
+        key: 'CHOICE_REWRITE',
+        value: {
+          choice_id: choiceToRewrite.uuid,
+          choice_text: choiceToRewrite.text,
+          operation_id: getCurrentOperationId(),
+          operation_name: getCurrentOperationName(),
+        },
+      });
 
       const indexToRewrite = parentChoiceStep.choices.getIndex();
       return this.startOperation(() => {

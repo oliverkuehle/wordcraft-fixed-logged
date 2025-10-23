@@ -37,6 +37,8 @@ import {KeyCommand} from '@core/shared/keyboard';
 
 import {styles} from './choices.css';
 import {styles as sharedStyles} from './shared.css';
+import { logEvent } from '../db';
+import { getCurrentOperationId, getCurrentOperationName } from '../state';
 
 /**
  * A component that displays the choices available for the current choice step
@@ -124,6 +126,16 @@ export class ChoicesComponent extends MobxLitElement {
         keyLabel: 'esc',
         action: () => {
           operation.cancel();
+
+          logEvent({
+            key: 'CHOICE_CANCEL',
+            value: {
+              choice_id: '',
+              choice_text: '',
+              operation_id: getCurrentOperationId(),
+              operation_name: getCurrentOperationName(),
+            },
+          })
         },
       },
       refresh: {
@@ -132,6 +144,17 @@ export class ChoicesComponent extends MobxLitElement {
         keyLabel: 'tab',
         action: () => {
           operation.restart();
+          
+          logEvent({
+            key: 'CHOICE_REFRESH',
+            value: {
+              choice_id: '',
+              choice_text: '',
+              operation_id: getCurrentOperationId(),
+              operation_name: getCurrentOperationName(),
+            },
+          })
+
         },
       },
       rewrite: {
@@ -216,8 +239,28 @@ export class ChoicesComponent extends MobxLitElement {
       const onClickStar = preventDefault(() => {
         if (this.starredResultsService.hasStarred(choice)) {
           this.starredResultsService.unstar(choice);
+
+          logEvent({
+            key: 'CHOICE_UNSTAR',
+            value: {
+              choice_id: choice.uuid,
+              choice_text: choice.text,
+              operation_id: getCurrentOperationId(),
+              operation_name: getCurrentOperationName(),
+            },
+          });
         } else {
           this.starredResultsService.star(choice);
+
+          logEvent({
+            key: 'CHOICE_STAR',
+            value: {
+              choice_id: choice.uuid,
+              choice_text: choice.text,
+              operation_id: getCurrentOperationId(),
+              operation_name: getCurrentOperationName(),
+            },
+          });
         }
       });
 

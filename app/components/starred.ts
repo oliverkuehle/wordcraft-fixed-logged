@@ -34,6 +34,8 @@ import {ModelResult} from '@core/shared/types';
 
 import {styles as choicesStyles} from './choices.css';
 import {styles as sharedStyles} from './shared.css';
+import {logEvent} from '../db';
+import {getCurrentOperationId, getCurrentOperationName} from '../state';
 
 /**
  * Displays a list of starred choices to add to the editor.
@@ -80,6 +82,17 @@ export class StarredChoicesComponent extends MobxLitElement {
   private removeResult(index: number) {
     const result = this.choices.getEntry(index);
     if (result) {
+      
+      logEvent({
+        key: 'CHOICE_STARRED_REMOVE',
+        value: {
+          choice_id: result.uuid,
+          choice_text: result.text,
+          operation_id: getCurrentOperationId(),
+          operation_name: getCurrentOperationName(),
+        },
+      });
+
       this.choices.removeAtIndex(index);
       this.starredResultsService.unstar(result);
     }
@@ -90,6 +103,18 @@ export class StarredChoicesComponent extends MobxLitElement {
     if (result) {
       const text = result.text;
       this.textEditorService.insertGeneratedTextAtEndOfDoc(text);
+
+      logEvent({
+        key: 'CHOICE_STARRED_INSERT',
+        value: {
+          choice_id: result.uuid,
+          choice_text: result.text,
+          operation_id: getCurrentOperationId(),
+          operation_name: getCurrentOperationName(),
+          plainText: this.textEditorService.getPlainText(),
+        },
+      });
+
       this.removeResult(index);
     }
   }
