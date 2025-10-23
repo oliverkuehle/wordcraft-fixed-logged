@@ -54,7 +54,7 @@ export function makePromptHandler(model: GeminiModel, context: WordcraftContext)
     const promptContext = getPromptContext();
     const prompt = generatePrompt(params.text);
     const inputText = promptContext + prompt;
-    const results = await model.query(inputText);
+    const results = await model.query(inputText, {}, true, 'FIRST_SENTENCE');
 
     // Since the prompt expects the model to continue from the previous
     // sentence, we need to post-process the results by removing the text

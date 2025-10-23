@@ -68,7 +68,6 @@ export function makePromptHandler(model: GeminiModel, context: WordcraftContext)
   }
 
   return async function replace(params: ReplacePromptParams) {
-    console.log('replace prompt');
     const {pre, post, nWords} = params;
     const examples = context.getExampleData<ReplaceExample>(
       OperationType.REPLACE
@@ -77,6 +76,6 @@ export function makePromptHandler(model: GeminiModel, context: WordcraftContext)
     const blankText = model.getBlank();
     const prompt = generatePrompt(pre, post, nWords, blankText);
     const inputText = promptContext + prompt;
-    return model.query(inputText);
+    return model.query(inputText, {}, true, 'REPLACE');
   };
 }

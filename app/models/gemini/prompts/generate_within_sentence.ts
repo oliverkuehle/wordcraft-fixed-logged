@@ -107,7 +107,7 @@ export function makePromptHandler(model: GeminiModel, context: WordcraftContext)
       endOfSentence
     );
     const inputText = promptContext + prompt;
-    const results = await model.query(inputText);
+    const results = await model.query(inputText, {}, true, 'GENERATE_WITHIN_SENTENCE');
 
     // When trying to copy a sentence with abnormal whitespaces (ie 2 spaces),
     // the model will only return output with 1 space between words. This makes

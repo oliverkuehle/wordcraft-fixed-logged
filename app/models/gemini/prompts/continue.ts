@@ -47,6 +47,6 @@ export function makePromptHandler(model: GeminiModel, context: WordcraftContext)
     const promptContext = getPromptContext();
     const prompt = generatePrompt(params.text);
     const inputText = promptContext + prompt;
-    return model.query(inputText);
+    return model.query(inputText, {}, true, 'CONTINUE');
   };
 }

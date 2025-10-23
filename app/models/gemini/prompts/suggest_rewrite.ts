@@ -62,8 +62,11 @@ export function makePromptHandler(model: GeminiModel, context: WordcraftContext)
     const modelParams = {};
     const shouldParse = false;
     const inputText = promptContext + prompt;
-    const results = await model.query(inputText, modelParams, shouldParse);
+    const results = await model.query(inputText, modelParams, shouldParse, 'SUGGEST_REWRITE');
 
     return model.parseResults(results);
   };
 }
+
+
+

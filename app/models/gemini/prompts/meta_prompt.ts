@@ -66,6 +66,6 @@ export function makePromptHandler(model: GeminiModel, context: WordcraftContext)
     }
     const prompt = generatePrompt(promptText);
     const inputText = promptContext + prompt;
-    return model.query(inputText);
+    return model.query(inputText, {}, true, 'META_PROMPT');
   };
 }

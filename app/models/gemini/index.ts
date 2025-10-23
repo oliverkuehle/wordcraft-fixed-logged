@@ -42,6 +42,7 @@ import {
 
 import {ContextService, StatusService} from '@services/services';
 import {startsWithPunctuation} from '@lib/parse_sentences/utils';
+import { logEvent, LogEventTextModelKey } from '../../db';
 
 const D0 = '{';
 const D1 = '}';
@@ -123,15 +124,20 @@ export class GeminiModel extends Model {
   override async query(
     promptText: string,
     params: Partial<ModelParams> = {},
-    shouldParse = true
+    shouldParse = true,
+    operation: LogEventTextModelKey = 'UNKNOWN_OPERATION',
   ) {
     // candidateCount: setting is being rejected or ignored. workaround:
     promptText = promptText + "\nGenerate 8 responses. " +
       "Each response must start with: " + D0 + " and end with: " + D1;
-    console.log('🚀 prompt text: ', promptText);
 
+    if (operation === 'UNKNOWN_OPERATION') {
+      console.error('Unknown operation');
+    }
+
+    const start = Date.now();
     const res = await callTextModel(promptText, params);
-    console.log('🚀 model results: ', res);
+    const response_time = Date.now() - start;    
 
     const responseText = getListOfReponses(res, D0, D1);
 
@@ -139,6 +145,19 @@ export class GeminiModel extends Model {
     const output = shouldParse
       ? this.parseResults(results, promptText)
       : results;
+
+
+    logEvent({
+      key: operation,
+      value: { 
+        prompt_text: promptText,
+        model_result: res,
+        output: output,
+        model_response_time: response_time,
+        response_time: Date.now() - start,
+      }
+    });
+
     return output;
   }
 

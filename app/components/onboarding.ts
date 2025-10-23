@@ -20,7 +20,7 @@ import '@components/shared_components/primitives/error_message';
 
 import {MobxLitElement} from '@adobe/lit-mobx';
 import {html} from 'lit';
-import {customElement} from 'lit/decorators.js';
+import {customElement, state} from 'lit/decorators.js';
 
 import {wordcraftCore} from '@core/wordcraft_core';
 import {AppService} from '@services/app_service';
@@ -28,6 +28,7 @@ import {DocumentStoreService} from '@services/document_store_service';
 
 import {styles} from './onboarding.css';
 import {styles as sharedStyles} from './shared.css';
+import {setParticipantId} from '../db';
 
 /**
  * The wordcraft onboarding flow - allows the user to choose what to "seed"
@@ -38,6 +39,7 @@ export class OnboardingComponent extends MobxLitElement {
   private readonly appService = wordcraftCore.getService(AppService);
   private readonly documentStoreService =
     wordcraftCore.getService(DocumentStoreService);
+  @state() participantId = '';
 
   static override get styles() {
     return [sharedStyles, styles];
@@ -62,17 +64,26 @@ export class OnboardingComponent extends MobxLitElement {
       <div class="wordcraft-description">
         Wordcraft is an AI-assisted text editor for writing stories.
       </div>
+      <label>Please enter your Participant ID:</label>
+      <input
+        type="text"
+        .value=${this.participantId}
+        @input=${(e) => (this.participantId = e.target.value.trim())}
+      />
     `;
   }
 
   renderGetStarted() {
     const getStarted = () => {
+      setParticipantId(this.participantId);
       this.appService.initializeEditor();
     };
 
     return html`
       <div class="get-started">
-        <button @click=${getStarted}>Start a New Story</button>
+        <button @click=${getStarted} ?disabled=${!this.participantId}>
+          Start a New Story
+        </button>
       </div>
     `;
   }

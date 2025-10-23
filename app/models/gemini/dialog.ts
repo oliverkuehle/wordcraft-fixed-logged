@@ -23,6 +23,7 @@ import { callDialogModel, ModelParams } from './api';
 import {createModelResults} from '../utils';
 
 import {ContextService, StatusService} from '@services/services';
+import { logEvent } from '../../db';
 
 interface ServiceProvider {
   contextService: ContextService;
@@ -40,15 +41,28 @@ export class GeminiDialogModel extends DialogModel {
     chatParams: DialogParams,
     modelParams: Partial<ModelParams> = {}
   ) {
-    console.log('🚀 DialogParams: ', JSON.stringify(chatParams));
 
+    const start = Date.now();
     const singleResponse = await callDialogModel(chatParams, modelParams);
-    console.log('🚀 model results: ', singleResponse);
+    const response_time = Date.now() - start;    
+
     const responseText = singleResponse.length
       ? [singleResponse]
       : [];
 
     const results = createModelResults(responseText);
+
+    logEvent({
+      key: 'CHAT',      
+      value: {
+        prompt_text: JSON.stringify(chatParams),
+        model_result: singleResponse,
+        output: results,
+        model_response_time: response_time,
+        response_time: Date.now() - start,
+      },
+    });
+
     return results;
   }
 }

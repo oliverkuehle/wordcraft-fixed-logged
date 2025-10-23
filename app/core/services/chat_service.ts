@@ -22,6 +22,7 @@ import {ConfigService, ModelService, TextEditorService} from './services';
 
 import {Service} from './service';
 import {DialogMessage, DialogParams} from '../shared/interfaces';
+import { logEvent } from '../../db';
 
 interface ServiceProvider {
   configService: ConfigService;
@@ -131,6 +132,15 @@ export class ChatService extends Service {
     if (this.messages.length === 0) return;
     this.currentMessage = this.messages[this.messages.length - 2];
     this.messages = this.messages.slice(0, this.messages.length - 2);
+
+    logEvent({
+      key: 'UNDO_LAST_TURN',
+      value: {
+        newMessages: this.messages,
+        removedMessage: this.currentMessage,
+      }
+    })
+
   }
 }
 

@@ -99,7 +99,7 @@ export function makePromptHandler(model: GeminiModel, context: WordcraftContext)
     const promptContext = makePromptContext();
     const prompt = generatePrompt(pre, post, beginningOfSentence);
     const inputText = promptContext + prompt;
-    const results = await model.query(inputText);
+    const results = await model.query(inputText, {}, true, 'REWRITE_END_OF_SENTENCE');
 
     return results
       .filter((result) => {

@@ -69,6 +69,6 @@ export function makePromptHandler(model: GeminiModel, context: WordcraftContext)
     const prompt = makePrompt(pre, post, toRewrite, howToRewrite);
     const inputText = promptContext + prompt;
 
-    return model.query(inputText);
+    return model.query(inputText, {}, true, 'REWRITE_SENTENCE');
   };
 }
