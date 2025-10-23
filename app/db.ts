@@ -46,6 +46,7 @@ export type LogEventOperationStatus = {
   value: {
     operation_id: string;
     operation_name: string;
+    plainText: string;
     wasSuccess?: boolean;
   };
 }

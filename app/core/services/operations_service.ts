@@ -272,6 +272,7 @@ export class OperationsService extends Service {
         value: {
           operation_id: operation.getOperationData().id,
           operation_name: getOperationName(operation),
+          plainText: this.textEditorService.getPlainText(),
           wasSuccess: wasSuccess,
         },
       });
@@ -296,6 +297,7 @@ export class OperationsService extends Service {
         value: {
           operation_id: operation.getOperationData().id,
           operation_name: getOperationName(operation),
+          plainText: this.textEditorService.getPlainText(),
         },
       });
     })
@@ -315,6 +317,7 @@ export class OperationsService extends Service {
         value: {
           operation_id: currentOperation.getOperationData().id,
           operation_name: getOperationName(currentOperation),
+          plainText: this.textEditorService.getPlainText(),
         },
       });
 
