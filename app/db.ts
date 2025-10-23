@@ -104,8 +104,8 @@ export async function logEvent(
     event_value: {...event.value, user_id: participantId},
   });
 
-  console.log(JSON.parse(body));
-  return;
+  // console.log(JSON.parse(body));
+  // return;
 
   try {
     const response = await fetch('/api/log', {
