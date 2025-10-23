@@ -126,6 +126,7 @@ export class GeminiModel extends Model {
     params: Partial<ModelParams> = {},
     shouldParse = true,
     operation: LogEventTextModelKey = 'UNKNOWN_OPERATION',
+    instructions: string = null
   ) {
     // candidateCount: setting is being rejected or ignored. workaround:
     promptText = promptText + "\nGenerate 8 responses. " +
@@ -155,6 +156,7 @@ export class GeminiModel extends Model {
         output: output,
         model_response_time: response_time,
         response_time: Date.now() - start,
+        instructions: instructions
       }
     });
 

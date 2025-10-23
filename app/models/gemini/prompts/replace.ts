@@ -76,6 +76,6 @@ export function makePromptHandler(model: GeminiModel, context: WordcraftContext)
     const blankText = model.getBlank();
     const prompt = generatePrompt(pre, post, nWords, blankText);
     const inputText = promptContext + prompt;
-    return model.query(inputText, {}, true, 'REPLACE');
+    return model.query(inputText, {}, true, 'REPLACE', nWords.toString());
   };
 }

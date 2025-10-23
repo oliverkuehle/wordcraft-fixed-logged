@@ -90,6 +90,6 @@ export function makePromptHandler(model: GeminiModel, context: WordcraftContext)
     });
 
     const inputText = promptContext + prompt;
-    return model.query(inputText, {}, true, 'REWRITE_SELECTION');
+    return model.query(inputText, {}, true, 'REWRITE_SELECTION', howToRewrite);
   };
 }

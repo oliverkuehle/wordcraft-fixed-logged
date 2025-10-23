@@ -35,6 +35,7 @@ export type LogEventTextModel = {
     output: ModelResults;
     model_response_time: number;
     response_time: number;
+    instructions: string;
   };
 };
 
