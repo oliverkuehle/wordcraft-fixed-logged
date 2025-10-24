@@ -22,6 +22,7 @@ import './onboarding';
 import './sidebar_right';
 import './text_editor';
 import './welcome_dialog';
+import './model_selector';
 
 import {MobxLitElement} from '@adobe/lit-mobx';
 import {Dialog} from '@material/mwc-dialog';
@@ -164,6 +165,7 @@ export class AppComponent extends MobxLitElement {
       <div id="sidebar-right">
         <wordcraft-sidebar-right></wordcraft-sidebar-right>
       </div>
+      <wordcraft-model-selector></wordcraft-model-selector>
     `;
   }
 

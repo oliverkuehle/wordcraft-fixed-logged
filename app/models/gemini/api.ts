@@ -24,6 +24,7 @@ const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
 import { HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
 import { DialogParams } from '@core/shared/interfaces';
+import { getSelectedModel } from "../../state";
 
 // Default safety settings
 const safetySettings = [
@@ -75,7 +76,7 @@ export async function callTextModel(
   genConfig.generationConfig.maxOutputTokens = 1024;
 
   const model = genAI.getGenerativeModel({
-    model: TEXT_MODEL_ID, genConfig, safetySettings
+    model: getSelectedModel(), genConfig, safetySettings
   });
   const result = await model.generateContent(textPrompt);
   const response = await result.response;
@@ -92,7 +93,7 @@ export async function callDialogModel(
   genConfig.generationConfig.candidateCount = 1;
 
   const model = genAI.getGenerativeModel({
-    model: DIALOG_MODEL_ID, genConfig, safetySettings
+    model: getSelectedModel(), genConfig, safetySettings
   });
 
   // get lastest chat request (last message)
