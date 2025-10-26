@@ -14,13 +14,13 @@ const pool = new Pool({
 
 // POST /api/log  -> { userId?: number, eventKey: string, eventValue: any }
 app.post('/api/log', async (req, res) => {
-  const {userId = null, event_key, event_value} = req.body ?? {};
+  const {user_id, event_key, event_value} = req.body ?? {};
   if (!event_key) return res.status(400).json({error: 'eventKey required'});
 
   try {
     await pool.query(
       'INSERT INTO logs (user_id, event_key, event_value) VALUES ($1, $2, $3)',
-      [userId, event_key, JSON.stringify(event_value)]
+      [user_id, event_key, JSON.stringify(event_value)]
     );
     res.json({ok: true});
   } catch (err) {

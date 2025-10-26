@@ -99,9 +99,10 @@ export type LogEventTextModelKey = LogEventTextModel['key'];
 export async function logEvent(
   event: LogEventTextModel | LogEventDialogModel | LogEventChoices | LogEventOperationStatus
 ): Promise<void> {
-  const body = JSON.stringify({    
+  const body = JSON.stringify({        
     event_key: event.key,
-    event_value: {...event.value, user_id: participantId},
+    user_id: participantId,
+    event_value: event.value,
   });
 
   // console.log(JSON.parse(body));
